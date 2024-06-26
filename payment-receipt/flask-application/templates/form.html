@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Receipt Generator</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="mt-5">Generate Payment Receipt</h1>
+    <form action="/generate_receipt" method="post">
+      <h2>Company Information</h2>
+      <div class="form-group">
+        <label for="company_name">Company Name</label>
+        <input type="text" class="form-control" id="company_name" name="company_name" required>
+      </div>
+      <div class="form-group">
+        <label for="company_address">Company Address</label>
+        <input type="text" class="form-control" id="company_address" name="company_address" required>
+      </div>
+      <div class="form-group">
+        <label for="company_phone">Company Phone</label>
+        <input type="text" class="form-control" id="company_phone" name="company_phone" required>
+      </div>
+      <h2>Receipt Information</h2>
+      <div class="form-group">
+        <label for="receipt_number">Receipt Number</label>
+        <input type="text" class="form-control" id="receipt_number" name="receipt_number" required>
+      </div>
+      <h2>Customer Information</h2>
+      <div class="form-group">
+        <label for="customer_name">Customer Name</label>
+        <input type="text" class="form-control" id="customer_name" name="customer_name" required>
+      </div>
+      <div class="form-group">
+        <label for="customer_address">Customer Address</label>
+        <input type="text" class="form-control" id="customer_address" name="customer_address" required>
+      </div>
+      <div class="form-group">
+        <label for="customer_phone">Customer Phone</label>
+        <input type="text" class="form-control" id="customer_phone" name="customer_phone" required>
+      </div>
+      <h2>Items</h2>
+      <div class="form-group">
+        <label for="item1_description">Item 1 Description</label>
+        <input type="text" class="form-control" id="item1_description" name="item1_description" required>
+      </div>
+      <div class="form-group">
+        <label for="item1_quantity">Item 1 Quantity</label>
+        <input type="number" class="form-control" id="item1_quantity" name="item1_quantity" required>
+      </div>
+      <div class="form-group">
+        <label for="item1_unit_price">Item 1 Unit Price</label>
+        <input type="number" step="0.01" class="form-control" id="item1_unit_price" name="item1_unit_price" required>
+      </div>
+      <div class="form-group">
+        <label for="item1_total">Item 1 Total</label>
+        <input type="number" step="0.01" class="form-control" id="item1_total" name="item1_total" required>
+      </div>
+      <div class="form-group">
+        <label for="item2_description">Item 2 Description</label>
+        <input type="text" class="form-control" id="item2_description" name="item2_description" required>
+      </div>
+      <div class="form-group">
+        <label for="item2_quantity">Item 2 Quantity</label>
+        <input type="number" class="form-control" id="item2_quantity" name="item2_quantity" required>
+      </div>
+      <div class="form-group">
+        <label for="item2_unit_price">Item 2 Unit Price</label>
+        <input type="number" step="0.01" class="form-control" id="item2_unit_price" name="item2_unit_price" required>
+      </div>
+      <div class="form-group">
+        <label for="item2_total">Item 2 Total</label>
+        <input type="number" step="0.01" class="form-control" id="item2_total" name="item2_total" required>
+      </div>
+      <div class="form-group">
+        <label for="total_amount">Total Amount</label>
+        <input type="number" step="0.01" class="form-control" id="total_amount" name="total_amount" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Generate Receipt</button>
+    </form>
+  </div>
+</body>
+
+</html>

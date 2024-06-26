@@ -1,6 +1,10 @@
+from flask import Flask, render_template, request, send_file
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from datetime import datetime
+import os
+
+app = Flask(__name__)
 
 
 def create_receipt(filename, transaction_details):
@@ -15,17 +19,20 @@ def create_receipt(filename, transaction_details):
         c.setFont("Courier-Bold", 24)
         c.drawString(200, height - 50, "Payment Receipt")
         c.setFont("Courier", 12)
-        c.drawString(50, height - 80, "Company Name")
-        c.drawString(50, height - 95, "1234 Main Street")
-        c.drawString(50, height - 110, "City, State ZIP Code")
-        c.drawString(50, height - 125, "Phone: (123) 456-7890")
+        c.drawString(50, height - 80, transaction_details["company_name"])
+        c.drawString(50, height - 95, transaction_details["company_address"])
+        c.drawString(50, height - 110, f"Phone: {transaction_details['company_phone']}")
         c.line(50, height - 130, width - 50, height - 130)
 
     # Draw footer
     def draw_footer():
         c.setFont("Courier-Oblique", 10)
         c.drawString(50, 30, "Thank you for your business!")
-        c.drawString(50, 15, "For any queries, contact us at (123) 456-7890")
+        c.drawString(
+            50,
+            15,
+            f"For any queries, contact us at {transaction_details['company_phone']}",
+        )
 
     # Draw item table
     def draw_item_table(items, y_start):
@@ -75,17 +82,42 @@ def create_receipt(filename, transaction_details):
     c.save()
 
 
-# Example transaction details
-transaction_details = {
-    "receipt_number": "123456789",
-    "customer_name": "John Doe",
-    "customer_address": "5678 Elm Street",
-    "customer_phone": "(987) 654-3210",
-    "items": [
-        {"description": "Widget A", "quantity": 2, "unit_price": 25.00, "total": 50.00},
-        {"description": "Widget B", "quantity": 1, "unit_price": 15.00, "total": 15.00},
-    ],
-    "total_amount": 65.00,
-}
+@app.route("/")
+def form():
+    return render_template("form.html")
 
-create_receipt("receipt.pdf", transaction_details)
+
+@app.route("/generate_receipt", methods=["POST"])
+def generate_receipt():
+    transaction_details = {
+        "company_name": request.form["company_name"],
+        "company_address": request.form["company_address"],
+        "company_phone": request.form["company_phone"],
+        "receipt_number": request.form["receipt_number"],
+        "customer_name": request.form["customer_name"],
+        "customer_address": request.form["customer_address"],
+        "customer_phone": request.form["customer_phone"],
+        "items": [
+            {
+                "description": request.form["item1_description"],
+                "quantity": int(request.form["item1_quantity"]),
+                "unit_price": float(request.form["item1_unit_price"]),
+                "total": float(request.form["item1_total"]),
+            },
+            {
+                "description": request.form["item2_description"],
+                "quantity": int(request.form["item2_quantity"]),
+                "unit_price": float(request.form["item2_unit_price"]),
+                "total": float(request.form["item2_total"]),
+            },
+        ],
+        "total_amount": float(request.form["total_amount"]),
+    }
+
+    receipt_filename = os.path.join("static", "receipt.pdf")
+    create_receipt(receipt_filename, transaction_details)
+    return send_file(receipt_filename, as_attachment=True)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
