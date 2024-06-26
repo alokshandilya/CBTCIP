@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, redirect, url_for, flash
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from datetime import datetime
 import os
 
 app = Flask(__name__)
+app.secret_key = "your_secret_key"
 
 
 def create_receipt(filename, transaction_details):
@@ -89,34 +90,50 @@ def form():
 
 @app.route("/generate_receipt", methods=["POST"])
 def generate_receipt():
-    transaction_details = {
-        "company_name": request.form["company_name"],
-        "company_address": request.form["company_address"],
-        "company_phone": request.form["company_phone"],
-        "receipt_number": request.form["receipt_number"],
-        "customer_name": request.form["customer_name"],
-        "customer_address": request.form["customer_address"],
-        "customer_phone": request.form["customer_phone"],
-        "items": [
-            {
-                "description": request.form["item1_description"],
-                "quantity": int(request.form["item1_quantity"]),
-                "unit_price": float(request.form["item1_unit_price"]),
-                "total": float(request.form["item1_total"]),
-            },
-            {
-                "description": request.form["item2_description"],
-                "quantity": int(request.form["item2_quantity"]),
-                "unit_price": float(request.form["item2_unit_price"]),
-                "total": float(request.form["item2_total"]),
-            },
-        ],
-        "total_amount": float(request.form["total_amount"]),
-    }
+    try:
+        company_name = request.form["company_name"]
+        company_address = request.form["company_address"]
+        company_phone = request.form["company_phone"]
+        receipt_number = request.form["receipt_number"]
+        customer_name = request.form["customer_name"]
+        customer_address = request.form["customer_address"]
+        customer_phone = request.form["customer_phone"]
 
-    receipt_filename = os.path.join("static", "receipt.pdf")
-    create_receipt(receipt_filename, transaction_details)
-    return send_file(receipt_filename, as_attachment=True)
+        items = []
+        total_amount = 0
+        for i in range(1, int(request.form["item_count"]) + 1):
+            description = request.form[f"item{i}_description"]
+            quantity = int(request.form[f"item{i}_quantity"])
+            unit_price = float(request.form[f"item{i}_unit_price"])
+            total = quantity * unit_price
+            total_amount += total
+
+            item = {
+                "description": description,
+                "quantity": quantity,
+                "unit_price": unit_price,
+                "total": total,
+            }
+            items.append(item)
+
+        transaction_details = {
+            "company_name": company_name,
+            "company_address": company_address,
+            "company_phone": company_phone,
+            "receipt_number": receipt_number,
+            "customer_name": customer_name,
+            "customer_address": customer_address,
+            "customer_phone": customer_phone,
+            "items": items,
+            "total_amount": total_amount,
+        }
+
+        receipt_filename = os.path.join("static", "receipt.pdf")
+        create_receipt(receipt_filename, transaction_details)
+        return send_file(receipt_filename, as_attachment=True)
+    except Exception as e:
+        flash(f"An error occurred: {e}")
+        return redirect(url_for("form"))
 
 
 if __name__ == "__main__":
