@@ -21,3 +21,31 @@ def play_audio(filename):
         print("Playback finished.")
     except FileNotFoundError:
         print(f"No file named {filename} found.")
+
+
+def main():
+    while True:
+        print("\nVoice Recorder")
+        print("1. Record Audio")
+        print("2. Play Audio")
+        print("3. Exit")
+        choice = input("Choose an option (1/2/3): ")
+
+        if choice == "1":
+            filename = input(
+                "Enter the file name to save the recording (e.g., recording.wav): "
+            )
+            duration = int(input("Enter the duration of the recording in seconds: "))
+            record_audio(filename, duration)
+        elif choice == "2":
+            filename = input("Enter the file name to play (e.g., recording.wav): ")
+            play_audio(filename)
+        elif choice == "3":
+            print("Exiting...")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+
+if __name__ == "__main__":
+    main()
