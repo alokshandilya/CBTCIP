@@ -17,9 +17,12 @@ def create_receipt(filename, transaction_details, company_details):
         c.setFont("Courier", 12)
         c.drawString(50, height - 80, company_details["name"])
         c.drawString(50, height - 95, company_details["address"])
-        c.drawString(50, height - 110, company_details["city"])
-        c.drawString(50, height - 125, f"Phone: {company_details['phone']}")
-        c.line(50, height - 130, width - 50, height - 130)
+        if company_details["city"]:
+            c.drawString(50, height - 110, company_details["city"])
+        if company_details["zip_code"]:
+            c.drawString(50, height - 125, company_details["zip_code"])
+        c.drawString(50, height - 140, f"Phone: {company_details['phone']}")
+        c.line(50, height - 150, width - 50, height - 150)
 
     # Draw footer
     def draw_footer():
@@ -77,31 +80,52 @@ def create_receipt(filename, transaction_details, company_details):
     c.save()
 
 
-def main():
-    company_details = {
-        "name": input("Enter company name: "),
-        "address": input("Enter company address: "),
-        "city": input("Enter company city, state, ZIP code: "),
-        "phone": input("Enter company phone number: "),
+def get_company_details():
+    print("Enter company details:")
+    name = input("Company Name: ")
+    address_city_zip = input("Company Address (City, State, ZIP Code): ")
+    phone = input("Company Phone Number: ")
+
+    # Splitting the address, city, and ZIP code based on the input format
+    parts = address_city_zip.split(",")
+    if len(parts) >= 2:
+        address = parts[0].strip()
+        city = parts[1].strip()
+        # Combining the rest of the parts back into the ZIP code
+        zip_code = ",".join(parts[2:]).strip()
+    else:
+        address = address_city_zip.strip()
+        city = ""
+        zip_code = ""
+
+    return {
+        "name": name,
+        "address": address,
+        "city": city,
+        "zip_code": zip_code,
+        "phone": phone,
     }
 
-    transaction_details = {
-        "receipt_number": input("Enter receipt number: "),
-        "customer_name": input("Enter customer name: "),
-        "customer_address": input("Enter customer address: "),
-        "customer_phone": input("Enter customer phone number: "),
-        "items": [],
-        "total_amount": 0.0,
-    }
 
+def get_transaction_details():
+    print("\nEnter transaction details:")
+    receipt_number = input("Receipt Number: ")
+    customer_name = input("Customer Name: ")
+    customer_address = input("Customer Address: ")
+    customer_phone = input("Customer Phone Number: ")
+
+    items = []
+    total_amount = 0.0
     while True:
-        description = input("Enter item description (or 'done' to finish): ")
+        description = input("\nEnter item description (or 'done' to finish): ")
         if description.lower() == "done":
             break
-        quantity = int(input("Enter item quantity: "))
-        unit_price = float(input("Enter item unit price: "))
+        quantity = int(input("Quantity: "))
+        unit_price = float(input("Unit Price: "))
         total = quantity * unit_price
-        transaction_details["items"].append(
+        total_amount += total
+
+        items.append(
             {
                 "description": description,
                 "quantity": quantity,
@@ -109,11 +133,24 @@ def main():
                 "total": total,
             }
         )
-        transaction_details["total_amount"] += total
 
-    filename = input("Enter filename for the receipt (e.g., 'receipt.pdf'): ")
+    return {
+        "receipt_number": receipt_number,
+        "customer_name": customer_name,
+        "customer_address": customer_address,
+        "customer_phone": customer_phone,
+        "items": items,
+        "total_amount": total_amount,
+    }
+
+
+def main():
+    company_details = get_company_details()
+    transaction_details = get_transaction_details()
+
+    filename = input("\nEnter filename for the receipt (e.g., 'receipt.pdf'): ")
     create_receipt(filename, transaction_details, company_details)
-    print(f"Receipt saved as {filename}")
+    print(f"\nReceipt saved as {filename}")
 
 
 if __name__ == "__main__":
